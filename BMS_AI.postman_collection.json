@@ -1,0 +1,51 @@
+{
+  "info": {
+    "_postman_id": "7b2d9bce-68c0-4a8d-8b5a-49e6b9a4fae2",
+    "name": "BMS AI API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "AI endpoints for Virtual Health Assistant"
+  },
+  "item": [
+    {
+      "name": "AI Triage Advice",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"symptom\": \"persistent cough and mild fever\",\n  \"age\": 34,\n  \"sex\": \"female\",\n  \"pregnant\": false,\n  \"chronic_conditions\": [\"asthma\"],\n  \"location\": \"Amman, Jordan\",\n  \"language\": \"Arabic\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ai/triage-advice",
+          "host": ["{{baseUrl}}"],
+          "path": ["ai", "triage-advice"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "AI Chat",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"history\": [\n    { \"role\": \"user\", \"content\": \"What can I do for a child with diarrhea?\" }\n  ],\n  \"language\": \"English\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ai/chat",
+          "host": ["{{baseUrl}}"],
+          "path": ["ai", "chat"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:8000", "type": "string" }
+  ]
+}

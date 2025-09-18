@@ -1,0 +1,9 @@
+{
+  "symptom": "persistent cough and mild fever",
+  "age": 34,
+  "sex": "female",
+  "pregnant": false,
+  "chronic_conditions": ["asthma"],
+  "location": "Amman, Jordan",
+  "language": "Arabic"
+}

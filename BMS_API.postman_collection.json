@@ -1,0 +1,273 @@
+{
+  "info": {
+    "_postman_id": "8f8a7f1e-1b5f-4f6c-9aa1-6f6e9a5f9c11",
+    "name": "BMS API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for Business Management System (BMS) FastAPI server"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /services/nearby",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/services/nearby?lat=28.61&lon=77.20&radius_km=15&limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "nearby"
+              ],
+              "query": [
+                { "key": "lat", "value": "28.61" },
+                { "key": "lon", "value": "77.20" },
+                { "key": "radius_km", "value": "15" },
+                { "key": "limit", "value": "5" }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Triage",
+      "item": [
+        {
+          "name": "POST /triage - EMERGENCY",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"symptom\": \"chest pain\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/triage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "triage"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /triage - URGENT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"symptom\": \"high fever\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/triage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "triage"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /triage - SELF-CARE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"symptom\": \"mild headache\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/triage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "triage"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Services",
+      "item": [
+        {
+          "name": "GET /services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/services?skip=0&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services"
+              ],
+              "query": [
+                { "key": "skip", "value": "0" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /services",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Has id and fields', function () { const json = pm.response.json(); pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('name'); pm.expect(json).to.have.property('location'); pm.expect(json).to.have.property('contact'); });",
+                  "pm.collectionVariables.set('serviceId', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Hospital\",\n  \"location\": \"123 Test St\",\n  \"contact\": \"555-0123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/services",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /services/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/services/{{serviceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "{{serviceId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /services/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Hospital\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/services/{{serviceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "{{serviceId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /services/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/services/{{serviceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "{{serviceId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "serviceId",
+      "value": "1",
+      "type": "string"
+    }
+  ]
+}
