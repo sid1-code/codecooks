@@ -187,6 +187,37 @@ class AIClient:
                 raise
         raise AIConfigError("AI client not properly configured")
 
+def detect_language(text: str) -> str | None:
+    """Detect language of input text using Gemini if configured; return language name like 'English'."""
+    try:
+        if genai is None:
+            return None
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        prompt = (
+            "Detect the human language of this text and answer only with the language name in English, "
+            "like: English, Arabic, French, Hindi, Spanish. Text:\n\n" + text[:800]
+        )
+        resp = model.generate_content(prompt)
+        return (resp.text or "").strip()
+    except Exception:
+        return None
+
+def translate_text(text: str, target_language: str) -> str:
+    """Translate text into target_language using Gemini if available; otherwise return original text."""
+    try:
+        if genai is None:
+            return text
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        prompt = f"Translate the following text into {target_language}. Only return the translated text.\n\n{text[:4000]}"
+        resp = model.generate_content(prompt)
+        return (resp.text or text).strip()
+    except Exception:
+        return text
+
+SAFETY_DISCLAIMER = (
+    "\n\nThis is not a diagnosis. Please seek professional care if symptoms persist or worsen."
+)
+
 SAFETY_SYSTEM_PROMPT = (
     "You are a compassionate, multilingual health assistant helping refugees and displaced people. "
     "Provide general information and self-care guidance only. Do not provide medical diagnosis. "

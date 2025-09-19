@@ -1,0 +1,39 @@
+name: chatbot_app
+description: A Flutter chatbot app with offline support and voice features.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Chat UI
+  flutter_chat_ui: ^1.6.15
+  flutter_chat_types: ^3.6.2
+  
+  # Voice features
+  speech_to_text: ^6.6.0
+  flutter_tts: ^3.8.5
+  
+  # Local storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
+  # Additional dependencies
+  cupertino_icons: ^1.0.2
+  permission_handler: ^11.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.7
+
+flutter:
+  uses-material-design: true

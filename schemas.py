@@ -43,6 +43,7 @@ class AITriageAdviceRequest(BaseModel):
 
 class AITriageAdviceResponse(BaseModel):
     advice: str
+    confidence: float | None = Field(None, ge=0, le=1, description="Model self-reported or heuristic confidence (0-1)")
 
 class AIChatMessage(BaseModel):
     role: str = Field(..., description="user or assistant")

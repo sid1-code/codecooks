@@ -254,17 +254,25 @@ def delete_service(service_id: int, db: Session = Depends(get_db)):
 def ai_triage_advice(req: schemas.AITriageAdviceRequest):
     """AI-generated triage advice with safety prompts and multilingual response."""
     try:
+        # Detect input language if not provided, and translate to English for model processing
+        original_lang = req.language or ai.detect_language(req.symptom) or "English"
+        symptom_en = ai.translate_text(req.symptom, "English") if original_lang.lower() != "english" else req.symptom
+
         messages = ai.get_triage_advice_payload(
-            symptom=req.symptom,
+            symptom=symptom_en,
             age=req.age,
             sex=req.sex,
             pregnant=req.pregnant,
             chronic_conditions=req.chronic_conditions,
             location=req.location,
-            language=req.language,
+            language="English",
         )
-        advice = ai.safe_call(messages)
-        return schemas.AITriageAdviceResponse(advice=advice)
+        advice_en = ai.safe_call(messages)
+        # Translate advice back to original_lang if needed
+        advice_out = ai.translate_text(advice_en + ai.SAFETY_DISCLAIMER, original_lang) if original_lang.lower() != "english" else advice_en + ai.SAFETY_DISCLAIMER
+        # Heuristic confidence (could be improved with provider-specific metadata)
+        confidence = 0.8
+        return schemas.AITriageAdviceResponse(advice=advice_out, confidence=confidence)
     except HTTPException:
         raise
     except Exception as e:
@@ -279,10 +287,44 @@ def ai_chat(req: schemas.AIChatRequest):
         history = [{"role": m.role, "content": m.content} for m in req.history]
         messages = ai.get_chat_payload(history=history, language=req.language)
         reply = ai.safe_call(messages)
-        return schemas.AIChatResponse(reply=reply)
+        # Append safety disclaimer always
+        return schemas.AIChatResponse(reply=reply + ai.SAFETY_DISCLAIMER)
     except Exception as e:
         logger.error(f"AI chat error: {e}")
         raise HTTPException(status_code=500, detail="AI chat error")
+
+# Alias endpoint to support clients calling '/chat' instead of '/ai/chat'
+@app.post("/chat", response_model=schemas.AIChatResponse)
+def chat_alias(req: schemas.AIChatRequest):
+    return ai_chat(req)
+
+# --- Integration helper endpoints ---
+
+@app.post("/translate")
+def translate(text: str, target_language: str):
+    """Translate arbitrary text to target_language using configured AI provider (Gemini)."""
+    try:
+        # Best-effort: will return original text if translation not configured
+        translated = ai.translate_text(text, target_language)
+        return {"text": translated}
+    except Exception as e:
+        logger.error(f"Translate error: {e}")
+        raise HTTPException(status_code=500, detail="Translate error")
+
+@app.get("/facilities", response_model=List[schemas.ServiceOut])
+def facilities(
+    lat: float = Query(..., ge=-90, le=90, description="Latitude"),
+    lon: float = Query(..., ge=-180, le=180, description="Longitude"),
+    radius_km: float = Query(10.0, gt=0, le=2000, description="Search radius in kilometers"),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    """Alias for services/nearby to match mobile integration name."""
+    try:
+        return crud.nearby_services(db, lat=lat, lon=lon, radius_km=radius_km, limit=limit)
+    except Exception as e:
+        logger.error(f"Facilities error: {e}")
+        raise HTTPException(status_code=500, detail="Facilities error")
 
 if __name__ == "__main__":
     import uvicorn
